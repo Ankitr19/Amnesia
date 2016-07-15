@@ -39,11 +39,11 @@ def send_sms_task(number, message):         #https://www.twilio.com/docs/api/res
                 from_   = "+12015915580",
                 body    = message,
                 )
-            log_file.write("Message sent to %s\n"%number)
+            log_file.write("%s UTC - Message sent to %s\n"%(datetime.now(timezone('UTC')), number))
             log_file.close()
             break
         except TwilioRestException as e:
-            log_file.write(e)
+            log_file.write("%s UTC - %s"(datetime.now(timezone('UTC')), e))
             attempts = attempts + 1
     log_file.close()
 
