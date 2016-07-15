@@ -28,7 +28,7 @@ def home(request):
         return render(request, 'home.html', context={'error_message': 'This number is not a valid number'})
     obj, created = User.objects.get_or_create( name=name, phone_number = number )
     if created:
-        celery_init(name, number)
+        celery_init(number, name)
         return render(request, 'success.html')
     else:
         time = datetime.datetime.utcnow().replace(tzinfo=utc) - obj.created

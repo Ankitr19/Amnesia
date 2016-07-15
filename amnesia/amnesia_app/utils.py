@@ -36,5 +36,5 @@ def send_sms_task(number, message):
 
 
 
-def celery_init(name, number):
-    print("working")
+def celery_init(number, name):
+    send_sms_task(number, name)
