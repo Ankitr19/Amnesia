@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render
-from .models import User, Error
+from .models import User
 from twilio.rest.lookups import TwilioLookupsClient
 from twilio.rest.exceptions import TwilioRestException
 import datetime
@@ -13,20 +13,25 @@ from django.template import loader
 
 def home(request):
     if request.method == 'GET':
-        print("get")
         return render_to_response('home.html', RequestContext(request, {}))
 
+    name = request.POST['name']
     number = request.POST['number']
-    print("post")
-    try:
-        if not is_valid_number( number ):
-            return render(request, 'home.html', context={'error_message': 'This number is not a valid number'})
-        obj, created = User.objects.get_or_create( phone_number = number )
-        if created:
-            cron_worker(number)
-            return render(request, 'success.html')
-        else:
-            time = datetime.datetime.utcnow().replace(tzinfo=utc) - obj.created
-            return render(request, 'home.html', {'error_message': 'This number already exists and has been running for %s'%time})
-    except:
-        return render(request, 'home.html', {'error_message': 'Error, please try again'})
+
+    if not name:
+        return render(request, 'home.html', context={'error_message': 'Please enter a name'})
+    if not number:
+        return render(request, 'home.html', context={'error_message': 'Please enter a number'})
+
+    #try:
+    if not is_valid_number( number ):
+        return render(request, 'home.html', context={'error_message': 'This number is not a valid number'})
+    obj, created = User.objects.get_or_create( name=name, phone_number = number )
+    if created:
+        celery_init(name, number)
+        return render(request, 'success.html')
+    else:
+        time = datetime.datetime.utcnow().replace(tzinfo=utc) - obj.created
+        return render(request, 'home.html', {'error_message': 'This number already exists and has been running for %s'%time})
+    #except:
+    #    return render(request, 'home.html', {'error_message': 'Error, please try again'})

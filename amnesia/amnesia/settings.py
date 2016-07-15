@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'amnesia_app',
-    'django_cron'
 ]
 
 MIDDLEWARE_CLASSES = [

@@ -1,7 +1,10 @@
 from twilio.rest.lookups import TwilioLookupsClient
 from twilio.rest.exceptions import TwilioRestException
 from twilio.rest import TwilioRestClient
+from celery.decorators import task
+from celery.utils.log import get_task_logger
 
+logger = get_task_logger(__name__)
 
 def is_valid_number(number):
     client = TwilioLookupsClient()
@@ -15,13 +18,23 @@ def is_valid_number(number):
         else:
             raise e
 
-def send_sms(number, name):
+@task(name="send_sms_task")
+def send_sms_task(number, message):
     client = TwilioRestClient()
-    client.messages.create(
-        to      = number,
-        from_   = "+12015915580",
-        body    = name,
-        )
+    attempts = 0
+    while attempts < 5:
+        try:
+            client.messages.create(
+                to      = number,
+                from_   = "+12015915580",
+                body    = message,
+                )
+            break
+        except TwilioRestException as e:
+            logger.message(e)
+            attempts = attempts + 1
 
-def cron_worker(number):
+
+
+def celery_init(name, number):
     print("working")

@@ -10,7 +10,10 @@
     {% if error_message %}<h4><strong>{{ error_message }}</strong></h4>{% endif %}
     <form method="post" action="/amnesia_app/home">
         {% csrf_token %}
-        <input type="text" name="number" id="number"/>
+        Name : <input type="text" name="name" id="name"/>
+        <br>
+        Phone Number : <input type="text" name="number" id="number"/>
+        <br> 
         <input type="submit" value="Submit" />
     </form>
 <br>
